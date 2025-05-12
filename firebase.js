@@ -13,7 +13,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   }
 } else {
   try {
-    const serviceAccount = require('./nuvexenterprise-firebase-adminsdk-fbsvc-0107aa5acf.json');
+    const serviceAccount = require('./nuvexenterprise-firebase-adminsdk-fbsvc-a93a5eb355.json');
     credential = admin.credential.cert(serviceAccount);
     console.log('Firebase Admin usando credenciais do arquivo local');
   } catch (error) {
