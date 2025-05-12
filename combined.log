@@ -1,0 +1,22 @@
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-04-29T19:22:06.072Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-04-29T19:31:39.791Z"}
+{"level":"info","message":"GET /cnpj/59375844000160 - IP: ::1","timestamp":"2025-04-29T19:33:07.867Z"}
+{"level":"info","message":"GET /cnpj/59375844000160 - IP: ::1","timestamp":"2025-04-29T19:36:41.733Z"}
+{"level":"info","message":"GET /cnpj/59375844000160 - IP: ::1","timestamp":"2025-04-29T19:44:20.117Z"}
+{"level":"info","message":"GET /cnpj/59375844000160 - IP: ::1","timestamp":"2025-04-29T19:44:26.368Z"}
+{"level":"info","message":"GET /cnpj/59375844000160 - IP: ::1","timestamp":"2025-04-29T19:44:41.051Z"}
+{"level":"info","message":"GET /cnpj/59375844000160 - IP: ::1","timestamp":"2025-04-29T19:45:21.301Z"}
+{"level":"info","message":"OPTIONS /signup - IP: ::1","timestamp":"2025-04-29T19:52:12.182Z"}
+{"level":"info","message":"POST /signup - IP: ::1","timestamp":"2025-04-29T19:52:12.189Z"}
+{"level":"info","message":"OPTIONS /signup - IP: ::1","timestamp":"2025-04-29T19:52:25.930Z"}
+{"level":"info","message":"POST /signup - IP: ::1","timestamp":"2025-04-29T19:52:25.937Z"}
+{"count":3,"level":"info","message":"Successfully retrieved Stripe plans","timestamp":"2025-05-07T19:09:16.575Z"}
+{"error":"Missing required param: success_url.","level":"error","message":"Error creating payment method session","stack":"Error: Missing required param: success_url.\n    at generateV1Error (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\Error.js:11:20)\n    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\RequestSender.js:108:62)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2025-05-07T19:09:24.149Z"}
+{"error":"Missing required param: success_url.","level":"error","message":"Error creating payment method session","stack":"Error: Missing required param: success_url.\n    at generateV1Error (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\Error.js:11:20)\n    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\RequestSender.js:108:62)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2025-05-07T19:09:25.914Z"}
+{"count":3,"level":"info","message":"Successfully retrieved Stripe plans","timestamp":"2025-05-07T19:10:11.091Z"}
+{"level":"info","message":"Cancelled existing subscription","subscriptionId":"sub_1RMDH2PFTVkGq67EsQkcuqdo","timestamp":"2025-05-07T19:10:14.213Z","userId":"yyHP6IELWQZKy1MIl3dXWHIYn6S2"}
+{"error":"Missing required param: customer.","level":"error","message":"Error activating plan","stack":"Error: Missing required param: customer.\n    at generateV1Error (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\Error.js:11:20)\n    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\RequestSender.js:108:62)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2025-05-07T19:10:14.513Z"}
+{"count":3,"level":"info","message":"Successfully retrieved Stripe plans","timestamp":"2025-05-07T19:10:18.138Z"}
+{"count":3,"level":"info","message":"Successfully retrieved Stripe plans","timestamp":"2025-05-07T19:16:22.432Z"}
+{"count":3,"level":"info","message":"Successfully retrieved Stripe plans","timestamp":"2025-05-07T19:17:26.909Z"}
+{"error":"Missing required param: success_url.","level":"error","message":"Error creating payment method session","stack":"Error: Missing required param: success_url.\n    at StripeError.generate (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\Error.js:10:20)\n    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\\Users\\Gustavo\\Desktop\\nuvex\\backend\\node_modules\\stripe\\cjs\\RequestSender.js:105:54)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2025-05-07T19:17:30.260Z"}
