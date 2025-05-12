@@ -14,12 +14,15 @@ const validateRouter = require('./routes/validate');
 const loginRoutes = require('./routes/login');
 const dotenv = require('dotenv');
 
-
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
-const FRONTEND_URL = 'http://localhost:8080';
+const PORT = process.env.PORT || 3000;
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'https://nuvex-pc02.onrender.com',
+  'https://nuvex-complete.vercel.app',
+  'http://localhost:8080',
+];
 
 app.set('trust proxy', 1);
 
@@ -29,10 +32,13 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', true);
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', true);
+  }
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();

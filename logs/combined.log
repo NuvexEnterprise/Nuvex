@@ -2776,3 +2776,4 @@
 {"level":"info","message":"GET /storage/NdoFLj1DBrWLkf4WEm7F5ca2a3g2 - IP: ::1","timestamp":"2025-05-12T01:04:40.024Z"}
 {"level":"info","message":"OPTIONS /storage/NdoFLj1DBrWLkf4WEm7F5ca2a3g2 - IP: ::1","timestamp":"2025-05-12T01:04:58.426Z"}
 {"level":"info","message":"GET /storage/NdoFLj1DBrWLkf4WEm7F5ca2a3g2 - IP: ::1","timestamp":"2025-05-12T01:04:58.431Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-05-12T01:31:54.792Z"}
