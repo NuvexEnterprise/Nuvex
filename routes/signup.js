@@ -3,6 +3,17 @@ const router = express.Router();
 const { db, admin } = require('../firebase');
 const logger = require('../logger');
 
+const errorMessages = {
+  'auth/email-already-exists': 'Este email já está em uso',
+  'auth/invalid-password': 'A senha deve ter pelo menos 6 caracteres',
+  'auth/invalid-email': 'Email inválido',
+  'auth/invalid-credential': 'Credencial inválida',
+  'auth/invalid-argument': 'Argumento inválido',
+  'auth/network-request-failed': 'Erro de rede, tente novamente',
+  'auth/internal-error': 'Erro interno do servidor',
+  'app/invalid-credential': 'Problema com as credenciais do servidor. Contate o suporte.',
+};
+
 router.post('/', async (req, res) => {
   const { email, fullName, password, trial } = req.body;
 
