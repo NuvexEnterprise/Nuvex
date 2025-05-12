@@ -1,29 +1,8 @@
 const admin = require('firebase-admin');
-
-let credential;
-
-if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-  try {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    credential = admin.credential.cert(serviceAccount);
-    console.log('Firebase Admin usando credenciais das variáveis de ambiente');
-  } catch (error) {
-    console.error('Erro ao analisar as credenciais Firebase das variáveis de ambiente:', error);
-    process.exit(1);
-  }
-} else {
-  try {
-    const serviceAccount = require('./nuvexenterprise-firebase-adminsdk-fbsvc-a93a5eb355.json');
-    credential = admin.credential.cert(serviceAccount);
-    console.log('Firebase Admin usando credenciais do arquivo local');
-  } catch (error) {
-    console.error('Erro ao carregar credenciais do arquivo:', error);
-    process.exit(1);
-  }
-}
+const serviceAccount = require('./nuvexenterprise-firebase-adminsdk-fbsvc-a93a5eb355.json');
 
 admin.initializeApp({
-  credential: credential
+  credential: admin.credential.cert(serviceAccount)
 });
 
 const db = admin.firestore();
