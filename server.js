@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 const FRONTEND_URLS = [
   'http://localhost:8080',
   'https://nuvex-pc02.onrender.com',
+  'https://nuvex-complete.vercel.app',
   process.env.CORS_ORIGIN
 ].filter(Boolean);
 
