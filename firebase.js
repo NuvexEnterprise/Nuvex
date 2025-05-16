@@ -1,10 +1,13 @@
 const admin = require('firebase-admin');
-const serviceAccount = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+
+// Corrige a private_key escapando \n corretamente
+const raw = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+raw.private_key = raw.private_key.replace(/\\n/g, '\n');
 
 try {
   if (!admin.apps.length) {
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
+      credential: admin.credential.cert(raw)
     });
     console.log('Firebase Admin inicializado com sucesso');
   }
