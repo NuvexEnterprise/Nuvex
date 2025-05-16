@@ -12,9 +12,12 @@ const signupRoutes = require('./routes/signup');
 const securityRoutes = require('./routes/security');
 const validateRouter = require('./routes/validate');
 const loginRoutes = require('./routes/login');
+const fetch = require('node-fetch'); // 👈 Adicionado para o disparador
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SELF_URL = 'https://nuvex-pc02.onrender.com'; // 👈 Substitua pela URL real do backend no Render
+
 const FRONTEND_URLS = [
   'http://localhost:8080',
   'https://nuvex-pc02.onrender.com',
@@ -35,7 +38,6 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
-  // Verifique se a origem está na lista de origens permitidas
   if (FRONTEND_URLS.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
@@ -73,4 +75,21 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
 
-app.listen(PORT, () => logger.info(`Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+  logger.info(`Servidor rodando na porta ${PORT}`);
+
+  // 🟢 Início do disparador de requisições para manter o backend ativo
+  const interval = 1000 * 60 * 14; // A ca da 14 minutos
+  setInterval(async () => {
+    try {
+      const res = await fetch(SELF_URL);
+      if (res.ok) {
+        console.log(`[PING] Backend acordado com sucesso (${res.status})`);
+      } else {
+        console.error(`[PING] Falha no ping (${res.status})`);
+      }
+    } catch (err) {
+      console.error(`[PING] Erro ao pingar o backend: ${err.message}`);
+    }
+  }, interval);
+});

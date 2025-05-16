@@ -2869,3 +2869,8 @@
 {"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-05-16T17:27:34.246Z"}
 {"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-05-16T18:26:40.349Z"}
 {"level":"info","message":"Servidor rodando na porta 3000","timestamp":"16/05/2025, 15:29:18"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"16/05/2025, 15:36:24"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"16/05/2025, 15:36:34"}
+{"level":"info","message":"GET /stripe/stripe-plans - IP: ::1","timestamp":"16/05/2025, 16:03:18"}
+{"level":"info","message":"GET /stripe/stripe-plans - IP: ::1","timestamp":"16/05/2025, 16:03:23"}
+{"level":"info","message":"GET /stripe/stripe-plans - IP: ::1","timestamp":"16/05/2025, 16:19:53"}
