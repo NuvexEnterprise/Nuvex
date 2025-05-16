@@ -15,9 +15,9 @@ const loginRoutes = require('./routes/login');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.NODE_ENV === 'production' 
+const FRONTEND_URL = process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' 
   ? 'https://nuvex-pc02.onrender.com'
-  : 'http://localhost:8080';
+  : 'http://localhost:8080');
 
 app.set('trust proxy', 1);
 
