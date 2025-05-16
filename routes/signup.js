@@ -3,71 +3,52 @@ const router = express.Router();
 const { db, admin } = require('../firebase');
 const logger = require('../logger');
 
-const errorMessages = {
-  'auth/email-already-exists': 'Este email já está em uso',
-  'auth/invalid-password': 'A senha deve ter pelo menos 6 caracteres',
-  'auth/invalid-email': 'Email inválido',
-  'auth/invalid-credential': 'Credencial inválida',
-  'auth/invalid-argument': 'Argumento inválido',
-  'auth/network-request-failed': 'Erro de rede, tente novamente',
-  'auth/internal-error': 'Erro interno do servidor',
-  'app/invalid-credential': 'Problema com as credenciais do servidor. Contate o suporte.',
-};
-
+// Rota de cadastro
 router.post('/', async (req, res) => {
   const { email, fullName, password, trial } = req.body;
-
-  logger.info('Received signup request', { email, trial });
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const trialPeriod = trial === 'extended' ? 14 : 7;
 
-  // Validações...
-
-  const normalizedEmail = email.trim().toLowerCase();
-  const normalizedFullName = fullName.trim();
+  // Validação básica
+  if (!email || !fullName || !password) {
+    logger.warn('Campos obrigatórios faltando no cadastro');
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+  }
 
   try {
-    logger.info('Checking if email exists', { email: normalizedEmail });
+    // Verificar se o e-mail já existe
     try {
-      await admin.auth().getUserByEmail(normalizedEmail);
-      logger.warn('Signup attempt with existing email', { email: normalizedEmail });
-      return res.status(400).json({ error: 'Este email já está em uso' });
+      const userExists = await admin.auth().getUserByEmail(email);
+      if (userExists) {
+        logger.warn(`Tentativa de cadastro com email já existente: ${email}`);
+        return res.status(400).json({ error: 'Este email já está em uso' });
+      }
     } catch (error) {
       if (error.code !== 'auth/user-not-found') {
         throw error;
       }
     }
 
-    logger.info('Creating user', { email: normalizedEmail });
+    // Criar usuário no Firebase Authentication
     const userRecord = await admin.auth().createUser({
-      email: normalizedEmail,
-      password,
-      displayName: normalizedFullName,
+      email: email.trim(),
+      password: password,
+      displayName: fullName.trim(),
     });
-    logger.info('User created', { uid: userRecord.uid });
 
-    logger.info('Saving user data to Firestore', { uid: userRecord.uid });
+    // Salvar dados no Firestore com o período de trial apropriado
     await db.collection('users').doc(userRecord.uid).set({
-      fullName: normalizedFullName,
-      email: normalizedEmail,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      lastLogin: admin.firestore.FieldValue.serverTimestamp(),
+      fullName: fullName.trim(),
+      email: email.trim(),
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
       role: 'user',
       autoBilling: true,
-      trialPeriod,
-    });
+      trialPeriod: trialPeriod,
+    }, { merge: true });
 
-    logger.info('Generating custom token', { uid: userRecord.uid });
     const customToken = await admin.auth().createCustomToken(userRecord.uid);
-    logger.info('Custom token generated', { uid: userRecord.uid });
 
-    logger.info('User signed up successfully', {
-      email: normalizedEmail,
-      uid: userRecord.uid,
-      trialPeriod,
-    });
-
+    logger.info(`Usuário ${email} cadastrado com sucesso (trial: ${trialPeriod} dias), UID: ${userRecord.uid}`);
     res.status(201).json({
       userId: userRecord.uid,
       message: 'Cadastro concluído com sucesso',
@@ -75,12 +56,15 @@ router.post('/', async (req, res) => {
       trialDays: trialPeriod,
     });
   } catch (error) {
-    logger.error('Signup error', {
-      email: normalizedEmail,
-      errorCode: error.code,
-      errorMessage: error.message,
-      stack: error.stack,
-    });
+    logger.error('Erro no cadastro:', error);
+
+    const errorMessages = {
+      'auth/email-already-exists': 'Este email já está em uso',
+      'auth/invalid-email': 'Email inválido',
+      'auth/weak-password': 'Senha muito fraca',
+      'auth/operation-not-allowed': 'Operação não permitida',
+    };
+
     const message = errorMessages[error.code] || 'Ocorreu um erro durante o cadastro';
     res.status(400).json({ error: message });
   }

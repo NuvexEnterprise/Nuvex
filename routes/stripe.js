@@ -4,54 +4,40 @@ const admin = require('firebase-admin');
 const { db } = require('../firebase');
 const router = express.Router();
 
-// Configurações hardcoded (removendo .env)
 const STRIPE_SECRET_KEY = 'sk_test_51R5WuOPFTVkGq67EIn9RsLP3VxNE45JUJli428nGLX7dwhnPsthXo7d276PvEOxUsgrATMd7fHUAWbqlmzHTavzl00WvGeWcAG';
 const STRIPE_WEBHOOK_SECRET = 'whsec_c38a7b80d552c42fc35ade8d80722369dfb705cdb42969871c00d00a1874dc14';
 const FRONTEND_URL = 'http://localhost:8080';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 
+// Função para adicionar um atraso
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 router.get('/stripe-plans', async (req, res) => {
     try {
-        const prices = await stripe.prices.list({
-            active: true,
-            type: 'recurring',
-            limit: 100,
-        });
+        const ADAMANTIUM_PRICE_ID = 'price_1RPOLWPFTVkGq67Ehen3VlPw';
+        const ADAMANTIUM_PRODUCT_ID = 'prod_SK2QI7M18nQ5IG';
 
-        if (!prices.data.length) {
-            return res.status(404).json({ error: 'Nenhum plano recorrente ativo encontrado no Stripe' });
-        }
+        // Busca apenas o preço do plano Adamantium
+        const price = await stripe.prices.retrieve(ADAMANTIUM_PRICE_ID);
+        const product = await stripe.products.retrieve(ADAMANTIUM_PRODUCT_ID);
 
-        const promises = prices.data.map(async (price) => {
-            try {
-                const product = await stripe.products.retrieve(price.product);
-                return {
-                    id: price.id,
-                    name: product.name || 'Plano sem nome',
-                    price: price.unit_amount,
-                    currency: price.currency || 'BRL',
-                    description: product.description || 'Sem descrição disponível',
-                    benefits: product.metadata && product.metadata.benefits ? JSON.parse(product.metadata.benefits) : [],
-                    stripePriceId: price.id,
-                };
-            } catch (error) {
-                console.error(`Erro ao buscar produto para o preço ${price.id}:`, error.message);
-                return null;
-            }
-        });
+        const plan = {
+            id: price.id,
+            name: product.name || 'Adamantium',
+            price: price.unit_amount,
+            currency: price.currency || 'BRL',
+            description: product.description || 'Plano Adamantium',
+            benefits: product.metadata && product.metadata.benefits ? JSON.parse(product.metadata.benefits) : [],
+            stripePriceId: price.id,
+        };
 
-        const plans = await Promise.all(promises);
-        const validPlans = plans.filter(plan => plan !== null);
-
-        if (!validPlans.length) {
-            return res.status(500).json({ error: 'Nenhum plano válido encontrado após processamento' });
-        }
-
-        res.json(validPlans);
+        res.json([plan]); // Retorna array com apenas um plano
     } catch (error) {
-        console.error('Erro ao buscar planos do Stripe:', error.message);
-        res.status(500).json({ error: 'Erro ao listar planos do Stripe', details: error.message });
+        console.error('Erro ao buscar plano do Stripe:', error.message);
+        res.status(500).json({ error: 'Erro ao listar plano do Stripe', details: error.message });
     }
 });
 
@@ -128,7 +114,7 @@ router.post('/create-checkout-session', async (req, res) => {
             line_items: [{
                 price_data: {
                     currency: 'brl',
-                    product: 'prod_RzW6U19VvS3y4V',
+                    product: 'prod_SK2QI7M18nQ5IG',
                     unit_amount: isAnnual ? 23880 : 2990,
                     recurring: {
                         interval: isAnnual ? 'year' : 'month'
@@ -181,6 +167,12 @@ router.post('/activate-plan', async (req, res) => {
             return res.status(400).json({ error: 'userId é obrigatório' });
         }
 
+        // IDs fixos dos planos
+        const ADAMANTIUM_MENSAL = 'price_1RPOLWPFTVkGq67Ehen3VlPw';
+        const ADAMANTIUM_ANUAL = 'price_1RPRoNPFTVkGq67EhWWzM3vg'; 
+
+        const planId = isAnnual ? ADAMANTIUM_ANUAL : ADAMANTIUM_MENSAL;
+
         const userRef = db.collection('users').doc(userId);
         const userDoc = await userRef.get();
         
@@ -209,15 +201,7 @@ router.post('/activate-plan', async (req, res) => {
         const subscription = await stripe.subscriptions.create({
             customer: customerId,
             items: [{
-                price_data: {
-                    currency: 'brl',
-                    product: 'prod_RzW6U19VvS3y4V', // ID do produto Adamantium
-                    unit_amount: isAnnual ? 23880 : 2990,
-                    recurring: {
-                        interval: isAnnual ? 'year' : 'month'
-                    }
-                },
-                quantity: 1,
+                price: planId // Usa o planId determinado acima
             }],
             default_payment_method: defaultPaymentMethod,
             payment_settings: {
@@ -289,7 +273,7 @@ async function renewPlanAutomatically(userId) {
     if (userDoc.exists) {
         const data = userDoc.data();
         if (data.autoBilling && data.planEndDate && new Date() > new Date(data.planEndDate)) {
-            const planId = data.planId || 'price_1R6DDhPFTVkGq67E2MWc05IR';
+            const planId = data.planId || 'price_1RPOLWPFTVkGq67Ehen3VlPw';
             const customerId = data.stripeCustomerId;
 
             const price = await stripe.prices.retrieve(planId);

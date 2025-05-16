@@ -12,17 +12,12 @@ const signupRoutes = require('./routes/signup');
 const securityRoutes = require('./routes/security');
 const validateRouter = require('./routes/validate');
 const loginRoutes = require('./routes/login');
-const dotenv = require('dotenv');
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://nuvex-pc02.onrender.com',
-  'https://nuvex-complete.vercel.app',
-  'http://localhost:8080',
-];
+const FRONTEND_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://nuvex-pc02.onrender.com'
+  : 'http://localhost:8080';
 
 app.set('trust proxy', 1);
 
@@ -32,13 +27,10 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Credentials', true);
-  }
+  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', true);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -47,7 +39,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Para webhooks Stripe (raw body)
 app.use('/stripe/webhook', express.raw({ type: 'application/json' }));
 
 app.use(express.json());
