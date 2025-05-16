@@ -1,16 +1,16 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('./nuvex-88148-firebase-adminsdk-fbsvc-217ea656ef.json');
+const serviceAccount = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
 
 try {
-  if (!admin.apps.length) { 
+  if (!admin.apps.length) {
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+      credential: admin.credential.cert(serviceAccount)
     });
     console.log('Firebase Admin inicializado com sucesso');
   }
-} catch (error) {
+} catch (error) { 
   console.error('Erro ao inicializar Firebase Admin:', error);
-  process.exit(1); 
+  process.exit(1);
 }
 
 const db = admin.firestore();
