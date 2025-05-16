@@ -15,9 +15,14 @@ const loginRoutes = require('./routes/login');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' 
-  ? 'https://nuvex-pc02.onrender.com'
-  : 'http://localhost:8080');
+const FRONTEND_URLS = [
+  'http://localhost:8080',
+  'https://nuvex-pc02.onrender.com',
+  process.env.CORS_ORIGIN
+].filter(Boolean);
+
+// Log para debug
+console.log('Allowed origins:', FRONTEND_URLS);
 
 app.set('trust proxy', 1);
 
@@ -27,7 +32,13 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
+  const origin = req.headers.origin;
+  
+  // Verifique se a origem está na lista de origens permitidas
+  if (FRONTEND_URLS.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', true);
