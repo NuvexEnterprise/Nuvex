@@ -4,7 +4,13 @@ const winston = require('winston');
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
-    winston.format.timestamp(),
+    winston.format.timestamp({
+      format: () => {
+        return new Date().toLocaleString('pt-BR', {
+          timeZone: 'America/Sao_Paulo'
+        });
+      }
+    }),
     winston.format.json()
   ),
   transports: [

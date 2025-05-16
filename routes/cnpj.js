@@ -35,10 +35,12 @@ router.get('/:number', async (req, res) => {
     } catch (error) {
         console.error(`[${new Date().toISOString()}] Erro:`, error.message);
         
-        // 6. Tratamento de erros aprimorado
-        const statusCode = error.response?.status || 500;
-        const errorMessage = error.response?.data?.message || 'Erro na consulta';
+        let errorMessage = 'Erro na consulta';
+        if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+        }
 
+        const statusCode = error.response && error.response.status ? error.response.status : 500;
         res.status(statusCode).json({ 
             error: 'Falha na consulta',
             details: errorMessage
