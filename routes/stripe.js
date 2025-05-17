@@ -17,8 +17,8 @@ function delay(ms) {
 
 router.get('/stripe-plans', async (req, res) => {
     try {
-        const ADAMANTIUM_PRICE_ID = 'price_1RPOLWPFTVkGq67Ehen3VlPw';
-        const ADAMANTIUM_PRODUCT_ID = 'prod_SK2QI7M18nQ5IG';
+        const ADAMANTIUM_PRICE_ID = 'price_1RPtBGA2mta7c3mQOYn6EPuK';
+        const ADAMANTIUM_PRODUCT_ID = 'prod_SKYHnsK6XDiX1Y';
 
         // Busca apenas o preço do plano Adamantium
         const price = await stripe.prices.retrieve(ADAMANTIUM_PRICE_ID);
@@ -168,8 +168,8 @@ router.post('/activate-plan', async (req, res) => {
         }
 
         // IDs fixos dos planos
-        const ADAMANTIUM_MENSAL = 'price_1RPOLWPFTVkGq67Ehen3VlPw';
-        const ADAMANTIUM_ANUAL = 'price_1RPRoNPFTVkGq67EhWWzM3vg'; 
+        const ADAMANTIUM_MENSAL = 'price_1RPtBGA2mta7c3mQOYn6EPuK';
+        const ADAMANTIUM_ANUAL = 'price_1RPtBFA2mta7c3mQGi9wiktc'; 
 
         const planId = isAnnual ? ADAMANTIUM_ANUAL : ADAMANTIUM_MENSAL;
 
@@ -273,7 +273,7 @@ async function renewPlanAutomatically(userId) {
     if (userDoc.exists) {
         const data = userDoc.data();
         if (data.autoBilling && data.planEndDate && new Date() > new Date(data.planEndDate)) {
-            const planId = data.planId || 'price_1RPOLWPFTVkGq67Ehen3VlPw';
+            const planId = data.planId || 'price_1RPtBGA2mta7c3mQOYn6EPuK';
             const customerId = data.stripeCustomerId;
 
             const price = await stripe.prices.retrieve(planId);
