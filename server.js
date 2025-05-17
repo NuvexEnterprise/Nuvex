@@ -14,21 +14,18 @@ const validateRouter = require('./routes/validate');
 const loginRoutes = require('./routes/login');
 const fetch = require('node-fetch'); 
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SELF_URL = 'https://nuvex-pc02.onrender.com'; 
+const SELF_URL = 'https://nuvexenterprise.com.br'; 
 
 // Configuração CORS
 const corsOptions = {
-    origin: [
-        'http://localhost:8080',
-        'https://nuvexenterprise.com.br',
-        'https://nuvex-pc02.onrender.com'
-    ],
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature'],
-    credentials: true
+  origin: process.env.FRONTEND_URL,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature'],
+  credentials: true
 };
 
 app.use(cors(corsOptions));
