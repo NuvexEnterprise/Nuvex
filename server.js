@@ -13,20 +13,28 @@ const securityRoutes = require('./routes/security');
 const validateRouter = require('./routes/validate');
 const loginRoutes = require('./routes/login');
 const fetch = require('node-fetch'); 
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SELF_URL = 'https://nuvex-pc02.onrender.com'; 
 
-const FRONTEND_URLS = [
-  'http://localhost:8080',
-  'https://nuvex-pc02.onrender.com',
-  'https://nuvexenterprise.com.br',
-  process.env.CORS_ORIGIN
-].filter(Boolean);
+// Configuração CORS
+const corsOptions = {
+    origin: [
+        'http://localhost:8080',
+        'https://nuvexenterprise.com.br',
+        'https://nuvex-pc02.onrender.com'
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature'],
+    credentials: true
+};
+
+app.use(cors(corsOptions));
 
 // Log para debug
-console.log('Allowed origins:', FRONTEND_URLS);
+console.log('Allowed origins:', corsOptions.origin);
 
 app.set('trust proxy', 1);
 
@@ -38,7 +46,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
-  if (FRONTEND_URLS.includes(origin)) {
+  if (corsOptions.origin.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   
