@@ -12,11 +12,11 @@ const signupRoutes = require('./routes/signup');
 const securityRoutes = require('./routes/security');
 const validateRouter = require('./routes/validate');
 const loginRoutes = require('./routes/login');
-const fetch = require('node-fetch'); // 👈 Adicionado para o disparador
+const fetch = require('node-fetch'); 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SELF_URL = 'https://nuvex-pc02.onrender.com'; // 👈 Substitua pela URL real do backend no Render
+const SELF_URL = 'https://nuvex-pc02.onrender.com'; 
 
 const FRONTEND_URLS = [
   'http://localhost:8080',
@@ -78,8 +78,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   logger.info(`Servidor rodando na porta ${PORT}`);
 
-  // Sistema de keep-alive para evitar timeout no Render
-  const pingInterval = 1000 * 60 * 10; // A cada 10 minutos
+  const pingInterval = 1000 * 60 * 10; 
   let failedAttempts = 0;
 
   const keepAlive = async () => {
@@ -97,7 +96,6 @@ app.listen(PORT, () => {
       logger.error(`[Keep-Alive] Erro no ping: ${error.message} - Tentativa ${failedAttempts}`);
     }
 
-    // Se houver muitas falhas consecutivas, aumenta o intervalo temporariamente
     if (failedAttempts > 3) {
       setTimeout(keepAlive, pingInterval * 2);
     } else {
@@ -105,6 +103,5 @@ app.listen(PORT, () => {
     }
   };
 
-  // Inicia o sistema de keep-alive
   keepAlive();
 });
