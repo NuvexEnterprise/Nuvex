@@ -82,24 +82,27 @@ router.post('/create-payment-method-session', async (req, res) => {
 
 router.post('/create-checkout-session', async (req, res) => {
     try {
-        // Log para debug
-        console.log('Requisição recebida:', req.body);
+        const { userId, email, isAnnual, trialDays = 7 } = req.body;
         
-        const { userId, email, isAnnual } = req.body;
+        // Validação mais rigorosa dos dados de entrada
         if (!userId || !email) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 error: 'Dados incompletos',
-                details: 'userId e email são obrigatórios' 
+                details: 'userId e email são obrigatórios'
             });
         }
 
         const userRef = db.collection('users').doc(userId);
         const userDoc = await userRef.get();
-        
+
         if (!userDoc.exists) {
-            return res.status(404).json({ error: 'Usuário não encontrado' });
+            return res.status(404).json({ 
+                error: 'Usuário não encontrado',
+                details: `Usuário ${userId} não existe no banco de dados`
+            });
         }
 
+        // Verifica se já existe um customerId
         let customerId = userDoc.data().stripeCustomerId;
         
         if (!customerId) {
@@ -112,7 +115,6 @@ router.post('/create-checkout-session', async (req, res) => {
         }
 
         const trialStart = new Date();
-        const trialDays = userDoc.data().trialPeriod || 7; // Usar período personalizado ou 7 dias padrão
         const trialEnd = new Date(trialStart);
         trialEnd.setDate(trialEnd.getDate() + trialDays);
 
@@ -122,14 +124,7 @@ router.post('/create-checkout-session', async (req, res) => {
             mode: 'subscription',
             billing_address_collection: 'required',
             line_items: [{
-                price_data: {
-                    currency: 'brl',
-                    product: 'prod_SK2QI7M18nQ5IG',
-                    unit_amount: isAnnual ? 23880 : 2990,
-                    recurring: {
-                        interval: isAnnual ? 'year' : 'month'
-                    }
-                },
+                price: isAnnual ? 'price_1RPtBFA2mta7c3mQGi9wiktc' : 'price_1RPtBGA2mta7c3mQOYn6EPuK',
                 quantity: 1,
             }],
             subscription_data: {
@@ -139,8 +134,8 @@ router.post('/create-checkout-session', async (req, res) => {
                     trialEnd: trialEnd.toISOString()
                 }
             },
-            success_url: `${FRONTEND_URL}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${FRONTEND_URL}/billing?canceled=true`,
+            success_url: `${process.env.FRONTEND_URL}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.FRONTEND_URL}/billing?canceled=true`,
             metadata: {
                 userId,
                 isAnnual: String(isAnnual),
@@ -157,17 +152,16 @@ router.post('/create-checkout-session', async (req, res) => {
             planEndDate: trialEnd.toISOString()
         });
 
-        res.json({ 
+        return res.json({
             sessionId: session.id,
             success: true
         });
-        
+
     } catch (error) {
         console.error('Erro detalhado na criação da sessão:', error);
-        res.status(500).json({ 
+        return res.status(500).json({
             error: 'Erro ao criar sessão de checkout',
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            details: error.message
         });
     }
 });
