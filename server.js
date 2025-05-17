@@ -78,18 +78,33 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   logger.info(`Servidor rodando na porta ${PORT}`);
 
-  // 🟢 Início do disparador de requisições para manter o backend ativo
-  const interval = 1000 * 60 * 14; // A ca da 14 minutos
-  setInterval(async () => {
+  // Sistema de keep-alive para evitar timeout no Render
+  const pingInterval = 1000 * 60 * 10; // A cada 10 minutos
+  let failedAttempts = 0;
+
+  const keepAlive = async () => {
     try {
-      const res = await fetch(SELF_URL);
-      if (res.ok) {
-        console.log(`[PING] Backend acordado com sucesso (${res.status})`);
+      const response = await fetch(SELF_URL);
+      if (response.ok) {
+        logger.info(`[Keep-Alive] Ping bem sucedido (${response.status})`);
+        failedAttempts = 0;
       } else {
-        console.error(`[PING] Falha no ping (${res.status})`);
+        failedAttempts++;
+        logger.warn(`[Keep-Alive] Falha no ping (${response.status}) - Tentativa ${failedAttempts}`);
       }
-    } catch (err) {
-      console.error(`[PING] Erro ao pingar o backend: ${err.message}`);
+    } catch (error) {
+      failedAttempts++;
+      logger.error(`[Keep-Alive] Erro no ping: ${error.message} - Tentativa ${failedAttempts}`);
     }
-  }, interval);
+
+    // Se houver muitas falhas consecutivas, aumenta o intervalo temporariamente
+    if (failedAttempts > 3) {
+      setTimeout(keepAlive, pingInterval * 2);
+    } else {
+      setTimeout(keepAlive, pingInterval);
+    }
+  };
+
+  // Inicia o sistema de keep-alive
+  keepAlive();
 });
