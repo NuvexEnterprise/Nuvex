@@ -4,8 +4,9 @@ const admin = require('firebase-admin');
 const { db } = require('../firebase');
 const router = express.Router();
 
-const STRIPE_SECRET_KEY = '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';
-const STRIPE_WEBHOOK_SECRET = 'whsec_YY2fVNvjhZaEZ1V6UbEUQXISvkm34HYF';
+// Use chaves de teste para desenvolvimento
+const STRIPE_SECRET_KEY = 'sk_test_51R5WuBA2mta7c3mQmz0NvayIV6LnXOnVm9y2pQFkM390VJMtdcExjwnXxrtVmvyVRP24Ccr7gvxZaPZbHIZQROFU00XxHkT6EO';
+const STRIPE_WEBHOOK_SECRET = 'whsec_test_YY2fVNvjhZaEZ1V6UbEUQXISvkm34HYF';
 const FRONTEND_URL = 'https://nuvexenterprise.com.br/';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY);
@@ -78,9 +79,15 @@ router.post('/create-payment-method-session', async (req, res) => {
 
 router.post('/create-checkout-session', async (req, res) => {
     try {
+        // Log para debug
+        console.log('Requisição recebida:', req.body);
+        
         const { userId, email, isAnnual } = req.body;
-        if (!userId) {
-            return res.status(400).json({ error: 'userId é obrigatório' });
+        if (!userId || !email) {
+            return res.status(400).json({ 
+                error: 'Dados incompletos',
+                details: 'userId e email são obrigatórios' 
+            });
         }
 
         const userRef = db.collection('users').doc(userId);
@@ -148,14 +155,16 @@ router.post('/create-checkout-session', async (req, res) => {
         });
 
         res.json({ 
-            sessionId: session.id // Corrigido para retornar sessionId ao invés de id
+            sessionId: session.id,
+            success: true
         });
         
     } catch (error) {
-        console.error('Erro ao criar sessão:', error);
+        console.error('Erro detalhado na criação da sessão:', error);
         res.status(500).json({ 
             error: 'Erro ao criar sessão de checkout',
-            details: error.message 
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });
