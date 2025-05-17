@@ -4,12 +4,15 @@ const admin = require('firebase-admin');
 const { db } = require('../firebase');
 const router = express.Router();
 
-// Use chaves de teste para desenvolvimento
-const STRIPE_SECRET_KEY = 'sk_test_51R5WuBA2mta7c3mQmz0NvayIV6LnXOnVm9y2pQFkM390VJMtdcExjwnXxrtVmvyVRP24Ccr7gvxZaPZbHIZQROFU00XxHkT6EO';
-const STRIPE_WEBHOOK_SECRET = 'whsec_test_YY2fVNvjhZaEZ1V6UbEUQXISvkm34HYF';
-const FRONTEND_URL = 'https://nuvexenterprise.com.br/';
+// Validação das variáveis de ambiente
+if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET || !process.env.FRONTEND_URL) {
+    console.error('Erro: Variáveis de ambiente do Stripe não configuradas');
+    process.exit(1);
+}
 
-const stripe = new Stripe(STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2023-10-16' // Use a versão mais recente da API
+});
 
 // Função para adicionar um atraso
 function delay(ms) {
