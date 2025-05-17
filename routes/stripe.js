@@ -4,9 +4,9 @@ const admin = require('firebase-admin');
 const { db } = require('../firebase');
 const router = express.Router();
 
-const STRIPE_SECRET_KEY = 'sk_test_51R5WuOPFTVkGq67EIn9RsLP3VxNE45JUJli428nGLX7dwhnPsthXo7d276PvEOxUsgrATMd7fHUAWbqlmzHTavzl00WvGeWcAG';
-const STRIPE_WEBHOOK_SECRET = 'whsec_c38a7b80d552c42fc35ade8d80722369dfb705cdb42969871c00d00a1874dc14';
-const FRONTEND_URL = 'http://localhost:8080';
+const STRIPE_SECRET_KEY = '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';
+const STRIPE_WEBHOOK_SECRET = 'whsec_YY2fVNvjhZaEZ1V6UbEUQXISvkm34HYF';
+const FRONTEND_URL = 'https://nuvexenterprise.com.br/';
 
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 
