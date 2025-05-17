@@ -21,7 +21,7 @@ const SELF_URL = 'https://nuvex-pc02.onrender.com'; // 👈 Substitua pela URL r
 const FRONTEND_URLS = [
   'http://localhost:8080',
   'https://nuvex-pc02.onrender.com',
-  'https://nuvex-complete.vercel.app',
+  'https://nuvexenterprise.com.br',
   process.env.CORS_ORIGIN
 ].filter(Boolean);
 
