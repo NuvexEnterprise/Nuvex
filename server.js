@@ -12,26 +12,21 @@ const signupRoutes = require('./routes/signup');
 const securityRoutes = require('./routes/security');
 const validateRouter = require('./routes/validate');
 const loginRoutes = require('./routes/login');
-const fetch = require('node-fetch'); 
-const cors = require('cors');
-require('dotenv').config();
+const fetch = require('node-fetch'); // 👈 Adicionado para o disparador
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SELF_URL = 'https://nuvexenterprise.com.br'; 
+const SELF_URL = 'https://nuvex-pc02.onrender.com'; // 👈 Substitua pela URL real do backend no Render
 
-// Configuração CORS
-const corsOptions = {
-  origin: process.env.FRONTEND_URL,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature'],
-  credentials: true
-};
-
-app.use(cors(corsOptions));
+const FRONTEND_URLS = [
+  'http://localhost:8080',
+  'https://nuvex-pc02.onrender.com',
+  'https://nuvexenterprise.com.br',
+  process.env.CORS_ORIGIN
+].filter(Boolean);
 
 // Log para debug
-console.log('Allowed origins:', corsOptions.origin);
+console.log('Allowed origins:', FRONTEND_URLS);
 
 app.set('trust proxy', 1);
 
@@ -43,7 +38,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
-  if (corsOptions.origin.includes(origin)) {
+  if (FRONTEND_URLS.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   
@@ -83,7 +78,8 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   logger.info(`Servidor rodando na porta ${PORT}`);
 
-  const pingInterval = 1000 * 60 * 10; 
+  // Sistema de keep-alive para evitar timeout no Render
+  const pingInterval = 1000 * 60 * 10; // A cada 10 minutos
   let failedAttempts = 0;
 
   const keepAlive = async () => {
@@ -101,6 +97,7 @@ app.listen(PORT, () => {
       logger.error(`[Keep-Alive] Erro no ping: ${error.message} - Tentativa ${failedAttempts}`);
     }
 
+    // Se houver muitas falhas consecutivas, aumenta o intervalo temporariamente
     if (failedAttempts > 3) {
       setTimeout(keepAlive, pingInterval * 2);
     } else {
@@ -108,5 +105,6 @@ app.listen(PORT, () => {
     }
   };
 
+  // Inicia o sistema de keep-alive
   keepAlive();
 });
