@@ -78,7 +78,7 @@ router.post('/create-payment-method-session', async (req, res) => {
 
 router.post('/create-checkout-session', async (req, res) => {
     try {
-        const { userId, email, isAnnual } = req.body;
+        const { userId, email, isAnnual, couponCode } = req.body;
         if (!userId) {
             return res.status(400).json({ error: 'userId é obrigatório' });
         }
@@ -102,11 +102,12 @@ router.post('/create-checkout-session', async (req, res) => {
         }
 
         const trialStart = new Date();
-        const trialDays = userDoc.data().trialPeriod || 7; // Usar período personalizado ou 7 dias padrão
+        const trialDays = userDoc.data().trialPeriod || 7;
         const trialEnd = new Date(trialStart);
         trialEnd.setDate(trialEnd.getDate() + trialDays);
 
-        const session = await stripe.checkout.sessions.create({
+        // Configuração base da sessão
+        const sessionConfig = {
             customer: customerId,
             payment_method_types: ['card'],
             mode: 'subscription',
@@ -137,7 +138,25 @@ router.post('/create-checkout-session', async (req, res) => {
                 trialStart: trialStart.toISOString(),
                 trialEnd: trialEnd.toISOString()
             }
-        });
+        };
+
+        // Adiciona cupom se fornecido
+        if (couponCode) {
+            try {
+                // Verifica se o cupom existe
+                const coupon = await stripe.coupons.retrieve(couponCode);
+                if (coupon.valid) {
+                    sessionConfig.discounts = [{
+                        coupon: couponCode,
+                    }];
+                }
+            } catch (error) {
+                console.log('Cupom inválido:', error.message);
+                // Continua sem aplicar o cupom se ele for inválido
+            }
+        }
+
+        const session = await stripe.checkout.sessions.create(sessionConfig);
 
         await userRef.update({
             trialStart: trialStart.toISOString(),
@@ -148,7 +167,7 @@ router.post('/create-checkout-session', async (req, res) => {
         });
 
         res.json({ 
-            sessionId: session.id // Corrigido para retornar sessionId ao invés de id
+            sessionId: session.id
         });
         
     } catch (error) {
